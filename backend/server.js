@@ -7,7 +7,11 @@ app.use(cors());
 app.use(express.json());
 
 // Routes akan didaftarkan di sini nanti
-// app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/movies', require('./routes/movieRoutes'));
+app.use('/api/reviews', require('./routes/reviewRoutes'));
+app.use('/api/watchlist', require('./routes/watchlistRoutes'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
