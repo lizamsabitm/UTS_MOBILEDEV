@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  name      String?
+  
+  followers Follows[] @relation("following")
+  following Follows[] @relation("follower")
+  reviews   Review[]
+  likes     ReviewLike[]
+  comments  ReviewComment[]
+  lists     List[]
+  watchlist Watchlist[]
+}
+
+model Follows {
+  followerId  Int
+  followingId Int
+  follower    User @relation("follower", fields: [followerId], references: [id])
+  following   User @relation("following", fields: [followingId], references: [id])
+  @@id([followerId, followingId])
+}
+
+model Movie {
+  id          Int      @id @default(autoincrement())
+  tmdbId      Int      @unique
+  title       String
+  posterPath  String?
+  
+  reviews     Review[]
+  listMovies  ListMovie[]
+  watchlisted Watchlist[]
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  movieId   Int
+  rating    Float
+  content   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  likes     ReviewLike[]
+  comments  ReviewComment[]
+}
+
+model ReviewLike {
+  userId   Int
+  reviewId Int
+  user     User   @relation(fields: [userId], references: [id])
+  review   Review @relation(fields: [reviewId], references: [id])
+  @@id([userId, reviewId])
+}
+
+model ReviewComment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  reviewId  Int
+  content   String
+  createdAt DateTime @default(now())
+
+  user      User   @relation(fields: [userId], references: [id])
+  review    Review @relation(fields: [reviewId], references: [id])
+}
+
+model List {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String?
+  user        User        @relation(fields: [userId], references: [id])
+  movies      ListMovie[]
+}
+
+model ListMovie {
+  listId  Int
+  movieId Int
+  list    List  @relation(fields: [listId], references: [id])
+  movie   Movie @relation(fields: [movieId], references: [id])
+  @@id([listId, movieId])
+}
+
+model Watchlist {
+  userId  Int
+  movieId Int
+  user    User  @relation(fields: [userId], references: [id])
+  movie   Movie @relation(fields: [movieId], references: [id])
+  @@id([userId, movieId])
+}
