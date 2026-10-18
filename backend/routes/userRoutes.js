@@ -5,5 +5,6 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 // Pasang authMiddleware sebelum controller getProfile
 router.get('/profile', authMiddleware, userController.getProfile);
+router.put('/profile', authMiddleware, userController.updateProfile);
 
 module.exports = router;

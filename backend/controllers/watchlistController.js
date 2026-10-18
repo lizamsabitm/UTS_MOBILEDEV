@@ -45,3 +45,55 @@ exports.getWatchlist = async (req, res) => {
     res.status(500).json({ error: "Gagal mengambil daftar watchlist" });
   }
 };
+
+exports.removeFromWatchlist = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const tmdbId = parseInt(req.params.tmdbId);
+
+    const movie = await prisma.movie.findUnique({
+      where: { tmdbId: tmdbId }
+    });
+
+    if (!movie) {
+      return res.status(404).json({ error: "Film tidak ditemukan" });
+    }
+
+    await prisma.watchlist.deleteMany({
+      where: {
+        userId: userId,
+        movieId: movie.id
+      }
+    });
+
+    res.status(200).json({ message: "Film berhasil dihapus dari Watchlist" });
+  } catch (error) {
+    res.status(500).json({ error: "Gagal menghapus dari watchlist", detail: error.message });
+  }
+};
+
+exports.checkWatchlist = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const tmdbId = parseInt(req.params.tmdbId);
+
+    const movie = await prisma.movie.findUnique({
+      where: { tmdbId: tmdbId }
+    });
+
+    if (!movie) {
+      return res.status(200).json({ isWatchlisted: false });
+    }
+
+    const item = await prisma.watchlist.findFirst({
+      where: {
+        userId: userId,
+        movieId: movie.id
+      }
+    });
+
+    res.status(200).json({ isWatchlisted: !!item });
+  } catch (error) {
+    res.status(500).json({ error: "Gagal mengecek status watchlist" });
+  }
+};
