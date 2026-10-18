@@ -65,8 +65,8 @@ d:\New folder\dokumentasi\
    flutter run -d chrome
    ```
 4. **Build APK Android:**
-   File APK siap pakai berlokasi di:
-   `d:\New folder\UTS_MOBILEDEV-main\build\app\outputs\flutter-apk\app-debug.apk`
+   File APK rilis siap pakai (Release APK) dengan ikon kustom & koneksi TMDB berlokasi di:
+   `apk/Layarboxd-release.apk`
 
 ---
 
