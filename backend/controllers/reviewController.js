@@ -54,3 +54,34 @@ exports.getReviewsByMovie = async (req, res) => {
     res.status(500).json({ error: "Gagal mengambil review film" });
   }
 };
+
+// Ambil semua review terkini dari semua pengguna (Feed Beranda)
+exports.getAllReviews = async (req, res) => {
+  try {
+    const reviews = await prisma.review.findMany({
+      take: 20,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        movie: true,
+        user: { select: { id: true, username: true, name: true } }
+      }
+    });
+    res.status(200).json({ data: reviews });
+  } catch (error) {
+    res.status(500).json({ error: "Gagal mengambil daftar review", detail: error.message });
+  }
+};
+
+// Ambil review pengguna yang sedang login (Diary)
+exports.getMyReviews = async (req, res) => {
+  try {
+    const reviews = await prisma.review.findMany({
+      where: { userId: req.user.userId },
+      orderBy: { createdAt: 'desc' },
+      include: { movie: true }
+    });
+    res.status(200).json({ data: reviews });
+  } catch (error) {
+    res.status(500).json({ error: "Gagal mengambil review profil", detail: error.message });
+  }
+};

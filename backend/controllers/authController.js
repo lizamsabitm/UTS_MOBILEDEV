@@ -36,8 +36,12 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Cari user berdasarkan email
-    const user = await prisma.user.findUnique({ where: { email } });
+    // Cari user berdasarkan email atau username
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [{ email: email }, { username: email }]
+      }
+    });
     if (!user) {
       return res.status(404).json({ error: "Pengguna tidak ditemukan" });
     }
@@ -51,7 +55,17 @@ exports.login = async (req, res) => {
     // Buat token JWT yang akan melindungi endpoint lain
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    res.status(200).json({ message: "Login berhasil", token, username: user.username });
+    res.status(200).json({
+      message: "Login berhasil",
+      token,
+      username: user.username,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        name: user.name
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: "Gagal login", detail: error.message });
   }
