@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../../../core/network/api_client.dart';
 import 'fallback_movies.dart';
 import 'movie_model.dart';
@@ -6,8 +7,12 @@ import 'review_model.dart';
 
 class MovieService {
   final ApiClient _api = ApiClient();
+  static const String _tmdbApiKey = '2dca580c2a14b55200e784d157207b4d';
+  static const String _tmdbBaseUrl = 'https://api.themoviedb.org/3';
+  static const Duration _tmdbTimeout = Duration(seconds: 4);
 
   Future<List<Movie>> fetchPopular() async {
+    // 1. Try local backend
     try {
       final response = await _api.get('/movies/popular', auth: false);
       if (response.statusCode == 200) {
@@ -18,11 +23,25 @@ class MovieService {
       }
     } catch (_) {}
 
-    // Fallback to curated catalog when backend is offline or loading
+    // 2. Direct TMDB API fallback (so physical phones without local server connection work seamlessly)
+    try {
+      final response = await http.get(
+        Uri.parse('$_tmdbBaseUrl/movie/popular?api_key=$_tmdbApiKey&language=en-US&page=1'),
+      ).timeout(_tmdbTimeout);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final list = data['results'];
+        final parsed = Movie.listFromJson(list);
+        if (parsed.isNotEmpty) return parsed;
+      }
+    } catch (_) {}
+
+    // 3. Fallback to curated catalog
     return FallbackMovies.popularMovies;
   }
 
   Future<List<Movie>> search(String query) async {
+    // 1. Try backend
     try {
       final response = await _api.get('/movies/search', queryParameters: {'q': query}, auth: false);
       if (response.statusCode == 200) {
@@ -33,7 +52,20 @@ class MovieService {
       }
     } catch (_) {}
 
-    // Fallback search across curated catalog
+    // 2. Direct TMDB search fallback
+    try {
+      final response = await http.get(
+        Uri.parse('$_tmdbBaseUrl/search/movie?api_key=$_tmdbApiKey&language=en-US&query=${Uri.encodeComponent(query)}&page=1'),
+      ).timeout(_tmdbTimeout);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final list = data['results'];
+        final parsed = Movie.listFromJson(list);
+        if (parsed.isNotEmpty) return parsed;
+      }
+    } catch (_) {}
+
+    // 3. Fallback search across curated catalog
     final q = query.toLowerCase();
     return FallbackMovies.popularMovies
         .where((m) => m.title.toLowerCase().contains(q) || (m.director?.toLowerCase().contains(q) ?? false))
@@ -41,6 +73,7 @@ class MovieService {
   }
 
   Future<Movie?> fetchDetail(int tmdbId) async {
+    // 1. Try backend
     try {
       final response = await _api.get('/movies/$tmdbId', auth: false);
       if (response.statusCode == 200) {
@@ -52,7 +85,20 @@ class MovieService {
       }
     } catch (_) {}
 
-    // Fallback to local detailed movie data
+    // 2. Direct TMDB detail fallback
+    try {
+      final response = await http.get(
+        Uri.parse('$_tmdbBaseUrl/movie/$tmdbId?api_key=$_tmdbApiKey&append_to_response=credits'),
+      ).timeout(_tmdbTimeout);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data is Map<String, dynamic>) {
+          return Movie.fromJson(data);
+        }
+      }
+    } catch (_) {}
+
+    // 3. Fallback to local detailed movie data
     try {
       return FallbackMovies.popularMovies.firstWhere((m) => m.id == tmdbId);
     } catch (_) {

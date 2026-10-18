@@ -3,6 +3,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../auth/data/auth_service.dart';
 import '../../auth/presentation/login_screen.dart';
 
+import 'package:http/http.dart' as http;
+import '../../../../core/config/api_config.dart';
 import '../data/user_service.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
@@ -353,10 +355,11 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
             const Divider(color: Color(0xFF242E37)),
 
             // Settings items
+            _buildSettingsTile('Server API Configuration', onTap: _showServerConfigDialog),
             _buildSettingsTile('App icon'),
             _buildSettingsTile('Push notifications'),
             _buildSettingsTile('Email notifications'),
-            _buildSettingsTile('Advanced settings'),
+            _buildSettingsTile('Advanced settings', onTap: _showServerConfigDialog),
             _buildSettingsTile('Subscription settings'),
             _buildSettingsTile('Send logs', hasArrow: false),
             const SizedBox(height: 12),
@@ -378,6 +381,125 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
             const SizedBox(height: 30),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showServerConfigDialog() {
+    final controller = TextEditingController(text: ApiConfig.baseUrl);
+    bool testing = false;
+    String? statusMessage;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF1F2730),
+            title: const Text('Backend Server URL', style: TextStyle(color: Colors.white, fontSize: 18)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Masukkan IP komputer untuk integrasi backend MySQL (port 3000):',
+                  style: TextStyle(color: Color(0xFF899AA9), fontSize: 13),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: 'http://192.168.1.4:3000/api',
+                    hintStyle: const TextStyle(color: Color(0xFF455565)),
+                    filled: true,
+                    fillColor: const Color(0xFF14181C),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                  ),
+                ),
+                if (statusMessage != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    statusMessage!,
+                    style: TextStyle(
+                      color: statusMessage!.startsWith('Berhasil') ? AppTheme.accentGreen : const Color(0xFFFF8000),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: testing
+                          ? null
+                          : () async {
+                              setModalState(() {
+                                testing = true;
+                                statusMessage = 'Menguji koneksi...';
+                              });
+                              try {
+                                final res = await http
+                                    .get(Uri.parse('${controller.text.trim()}/movies/popular'))
+                                    .timeout(const Duration(seconds: 3));
+                                setModalState(() {
+                                  testing = false;
+                                  statusMessage = res.statusCode == 200
+                                      ? 'Berhasil terhubung ke Backend MySQL!'
+                                      : 'Server merespon: ${res.statusCode}';
+                                });
+                              } catch (e) {
+                                setModalState(() {
+                                  testing = false;
+                                  statusMessage = 'Gagal terhubung: Server offline / IP tidak cocok.';
+                                });
+                              }
+                            },
+                      icon: testing
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accentGreen),
+                            )
+                          : const Icon(Icons.wifi, size: 16, color: AppTheme.accentGreen),
+                      label: const Text('Test Koneksi', style: TextStyle(color: AppTheme.accentGreen, fontSize: 12)),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        controller.text = ApiConfig.defaultLanUrl;
+                      },
+                      child: const Text('Reset', style: TextStyle(color: Color(0xFF899AA9), fontSize: 12)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Tutup', style: TextStyle(color: Color(0xFF899AA9))),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.accentGreen),
+                onPressed: () async {
+                  await ApiConfig.setBaseUrl(controller.text.trim());
+                  if (context.mounted) {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Server URL berhasil disimpan'),
+                        backgroundColor: AppTheme.accentGreen,
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Simpan', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -454,9 +576,9 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     );
   }
 
-  Widget _buildSettingsTile(String title, {bool hasArrow = true}) {
+  Widget _buildSettingsTile(String title, {bool hasArrow = true, VoidCallback? onTap}) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap ?? () {},
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 14),
         child: Row(
