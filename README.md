@@ -74,8 +74,9 @@ d:\New folder\dokumentasi\
 
 | Beranda Film Populer | Ulasan Komunitas (Live MySQL) | Quick Log Sheet |
 | :---: | :---: | :---: |
-| ![Beranda](screenshots/01_beranda_film_populer.png) | ![Ulasan](screenshots/02_ulasan_komunitas_live_mysql.png) | ![Quick Log](screenshots/03_quick_log_pencarian_film.png) |
+| ![Beranda](dokumentasi/screenshots/01_beranda_film_populer.png) | ![Ulasan](dokumentasi/screenshots/02_ulasan_komunitas_live_mysql.png) | ![Quick Log](dokumentasi/screenshots/03_quick_log_pencarian_film.png) |
 
 | Halaman Profil Pengguna | Form Edit Profil | Profil Setelah Diperbarui |
 | :---: | :---: | :---: |
-| ![Profil](screenshots/04_halaman_profil_user.png) | ![Edit Profil](screenshots/05_form_edit_profil_settings.png) | ![Saved](screenshots/06_profil_setelah_diedit_database.png) |
+| ![Profil](dokumentasi/screenshots/04_halaman_profil_user.png) | ![Edit Profil](dokumentasi/screenshots/05_form_edit_profil_settings.png) | ![Saved](dokumentasi/screenshots/06_profil_setelah_diedit_database.png) |
+
