@@ -208,8 +208,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
             itemCount: count + 1,
-            separatorBuilder: (_, __) =>
-                const Divider(color: Color(0xFF242E37), height: 32),
+            separatorBuilder: (_, idx) =>
+                idx == 0 ? const SizedBox.shrink() : const Divider(color: Color(0xFF242E37), height: 32),
             itemBuilder: (context, index) {
               if (index == 0) {
                 return Padding(
@@ -244,12 +244,21 @@ class _HomeScreenState extends State<HomeScreen> {
               final movieTitle = hasLive
                   ? (liveReviews[idx].movieTitle ?? 'Film Review')
                   : FallbackSocialData.popularReviews[idx].movieTitle;
+              final releaseYear = hasLive
+                  ? ''
+                  : FallbackSocialData.popularReviews[idx].releaseYear;
               final authorName = hasLive
                   ? liveReviews[idx].name
                   : FallbackSocialData.popularReviews[idx].authorName;
+              final authorAvatar = hasLive
+                  ? null
+                  : FallbackSocialData.popularReviews[idx].authorAvatar;
               final rating = hasLive
                   ? liveReviews[idx].rating
                   : FallbackSocialData.popularReviews[idx].rating;
+              final hasHeart = hasLive
+                  ? false
+                  : FallbackSocialData.popularReviews[idx].hasHeart;
               final content = hasLive
                   ? liveReviews[idx].content
                   : FallbackSocialData.popularReviews[idx].content;
@@ -257,112 +266,133 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? liveReviews[idx].posterUrl
                   : FallbackSocialData.popularReviews[idx].posterUrl;
 
-              return Row(
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Left: Poster thumbnail
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: SizedBox(
-                      width: 72,
-                      height: 105,
-                      child: Image.network(
-                        posterUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            Container(color: const Color(0xFF2C3946)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  // Right: Movie info, Rating, Author avatar, review text
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                movieTitle,
+                  // Row 1: Movie title + year (left), author name + avatar (right)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: movieTitle,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              authorName,
-                              style: const TextStyle(
-                                color: AppTheme.textSecondary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            CircleAvatar(
-                              radius: 11,
-                              backgroundColor: const Color(0xFF00E054),
-                              child: Text(
+                              if (releaseYear.isNotEmpty) ...[
+                                TextSpan(
+                                  text: ' $releaseYear',
+                                  style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        authorName,
+                        style: const TextStyle(
+                          color: AppTheme.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      CircleAvatar(
+                        radius: 13,
+                        backgroundColor: const Color(0xFF2C3946),
+                        backgroundImage: authorAvatar != null
+                            ? NetworkImage(authorAvatar)
+                            : null,
+                        child: authorAvatar == null
+                            ? Text(
                                 authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U',
                                 style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 10,
+                                  color: Colors.white,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                            ),
-                          ],
+                              )
+                            : null,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // Row 2: Star rating
+                  Row(
+                    children: [
+                      ...List.generate(5, (sIdx) {
+                        final isFilled = rating >= (sIdx + 1);
+                        return Icon(
+                          isFilled ? Icons.star_rounded : Icons.star_outline_rounded,
+                          size: 16,
+                          color: isFilled
+                              ? const Color(0xFF00E054)
+                              : const Color(0xFF33414E),
+                        );
+                      }),
+                      if (hasHeart) ...[
+                        const SizedBox(width: 6),
+                        const Icon(
+                          Icons.favorite,
+                          size: 14,
+                          color: Color(0xFFFF8000),
                         ),
-                        const SizedBox(height: 6),
-                        // Rating stars
-                        Row(
-                          children: [
-                            ...List.generate(5, (sIdx) {
-                              final isFilled = rating >= (sIdx + 1);
-                              return Icon(
-                                isFilled ? Icons.star_rounded : Icons.star_outline_rounded,
-                                size: 14,
-                                color: isFilled
-                                    ? const Color(0xFF00E054)
-                                    : const Color(0xFF33414E),
-                              );
-                            }),
-                                                        if (!hasLive) ...[
-                              const SizedBox(width: 6),
-                              const Icon(
-                                Icons.favorite,
-                                size: 13,
-                                color: Color(0xFFFF8000),
-                              ),
-                            ],
-                          ],
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  // Row 3: Poster (left) + Review text (right)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: SizedBox(
+                          width: 80,
+                          height: 120,
+                          child: Image.network(
+                            posterUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                Container(color: const Color(0xFF2C3946)),
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                                                Text(
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
                           content,
                           style: const TextStyle(
                             color: Color(0xFFBAC6D0),
                             fontSize: 13,
-                            height: 1.4,
+                            height: 1.45,
                           ),
                         ),
-                        if (hasLive) ...[
-                          const SizedBox(height: 8),
-                          ReviewActionsBar(
-                            key: ValueKey('home-review-${liveReviews[idx].id}'),
-                            reviewId: liveReviews[idx].id,
-                            initialLiked: liveReviews[idx].likedByMe,
-                            initialLikeCount: liveReviews[idx].likeCount,
-                            initialCommentCount: liveReviews[idx].commentCount,
-                          ),
-                        ],
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                  if (hasLive) ...[
+                    const SizedBox(height: 8),
+                    ReviewActionsBar(
+                      key: ValueKey('home-review-${liveReviews[idx].id}'),
+                      reviewId: liveReviews[idx].id,
+                      initialLiked: liveReviews[idx].likedByMe,
+                      initialLikeCount: liveReviews[idx].likeCount,
+                      initialCommentCount: liveReviews[idx].commentCount,
+                    ),
+                  ],
                 ],
               );
             },
