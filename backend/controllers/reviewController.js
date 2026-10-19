@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const { reviewInclude, serializeReview } = require('../utils/reviewSerializer');
 const prisma = new PrismaClient();
 
 exports.addReview = async (req, res) => {
@@ -44,12 +45,13 @@ exports.getReviewsByMovie = async (req, res) => {
     
     if (!movie) return res.status(200).json({ data: [] }); // Belum ada review di database lokal
 
+        const viewerId = req.user ? req.user.userId : null; // diisi optionalAuth (bisa kosong)
     const reviews = await prisma.review.findMany({
       where: { movieId: movie.id },
-      include: { user: { select: { username: true, name: true } } }, // Tampilkan nama pereview
+      include: reviewInclude(viewerId),
       orderBy: { createdAt: 'desc' }
     });
-    res.status(200).json({ data: reviews });
+    res.status(200).json({ data: reviews.map(serializeReview) });
   } catch (error) {
     res.status(500).json({ error: "Gagal mengambil review film" });
   }
@@ -58,15 +60,13 @@ exports.getReviewsByMovie = async (req, res) => {
 // Ambil semua review terkini dari semua pengguna (Feed Beranda)
 exports.getAllReviews = async (req, res) => {
   try {
+        const viewerId = req.user ? req.user.userId : null;
     const reviews = await prisma.review.findMany({
       take: 20,
       orderBy: { createdAt: 'desc' },
-      include: {
-        movie: true,
-        user: { select: { id: true, username: true, name: true } }
-      }
+      include: reviewInclude(viewerId)
     });
-    res.status(200).json({ data: reviews });
+    res.status(200).json({ data: reviews.map(serializeReview) });
   } catch (error) {
     res.status(500).json({ error: "Gagal mengambil daftar review", detail: error.message });
   }
@@ -76,11 +76,11 @@ exports.getAllReviews = async (req, res) => {
 exports.getMyReviews = async (req, res) => {
   try {
     const reviews = await prisma.review.findMany({
-      where: { userId: req.user.userId },
+            where: { userId: req.user.userId },
       orderBy: { createdAt: 'desc' },
-      include: { movie: true }
+      include: reviewInclude(req.user.userId)
     });
-    res.status(200).json({ data: reviews });
+    res.status(200).json({ data: reviews.map(serializeReview) });
   } catch (error) {
     res.status(500).json({ error: "Gagal mengambil review profil", detail: error.message });
   }

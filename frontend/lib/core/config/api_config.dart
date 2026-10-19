@@ -8,7 +8,7 @@ class ApiConfig {
   static String? _cachedBaseUrl;
 
   // The local IP of the developer PC on Wi-Fi (for testing on real physical Android devices)
-  static const String defaultLanUrl = 'http://192.168.1.4:3000/api';
+  static const String defaultLanUrl = 'http://192.168.1.5:3000/api';
   // Android emulator loopback alias
   static const String emulatorUrl = 'http://10.0.2.2:3000/api';
 

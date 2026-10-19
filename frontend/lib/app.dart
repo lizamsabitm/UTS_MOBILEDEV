@@ -39,11 +39,14 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   late int _selectedIndex;
 
-  static const List<Widget> _pages = <Widget>[
-    HomeScreen(),
-    SearchScreen(),
-    ActivityScreen(),
-    ProfileScreen(),
+  final GlobalKey<ActivityScreenState> _activityKey =
+      GlobalKey<ActivityScreenState>();
+
+  late final List<Widget> _pages = <Widget>[
+    const HomeScreen(),
+    const SearchScreen(),
+    ActivityScreen(key: _activityKey),
+    const ProfileScreen(),
   ];
 
   @override
@@ -56,6 +59,8 @@ class _MainScaffoldState extends State<MainScaffold> {
     setState(() {
       _selectedIndex = index;
     });
+    // Tab Activity ada di IndexedStack (initState hanya jalan sekali) -> segarkan saat dibuka
+    if (index == 2) _activityKey.currentState?.reload(silent: true);
   }
 
   void _onCenterPlusTapped() {
