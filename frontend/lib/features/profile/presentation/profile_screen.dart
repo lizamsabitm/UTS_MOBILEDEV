@@ -6,6 +6,7 @@ import '../../home/presentation/widgets/movie_poster_card.dart';
 import '../data/user_profile_model.dart';
 import '../data/user_service.dart';
 import 'profile_settings_screen.dart';
+import '../../social/presentation/follow_list_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -227,10 +228,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildItemRow('Reviews', user.reviews.length.toString()),
           _buildItemRow('Watchlist', user.watchlist.length.toString()),
           _buildItemRow('Lists', '0'),
-          _buildItemRow('Likes', '0'),
+          _buildItemRow('Likes', user.likeCount.toString()),
           _buildItemRow('Tags', '0'),
-          _buildItemRow('Following', '0'),
-          _buildItemRow('Followers', '0'),
+                    _buildItemRow(
+            'Following',
+            user.followingCount.toString(),
+            onTap: () => _openFollowList(user, FollowListType.following),
+          ),
+          _buildItemRow(
+            'Followers',
+            user.followerCount.toString(),
+            onTap: () => _openFollowList(user, FollowListType.followers),
+          ),
           _buildItemRow('Stats', null, hasProBadge: true),
           const SizedBox(height: 30),
         ],
@@ -238,9 +247,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildItemRow(String title, String? count, {bool hasProBadge = false}) {
+    Future<void> _openFollowList(UserProfile user, FollowListType type) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => FollowListScreen(userId: user.id, type: type)),
+    );
+    if (mounted) _loadProfile(); // jumlah following/followers bisa berubah
+  }
+
+  Widget _buildItemRow(
+    String title,
+    String? count, {
+    bool hasProBadge = false,
+    VoidCallback? onTap,
+  }) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap ?? () {},
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         decoration: const BoxDecoration(

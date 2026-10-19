@@ -5,6 +5,7 @@ import '../data/fallback_social_data.dart';
 import '../data/movie_model.dart';
 import '../data/movie_service.dart';
 import '../data/review_model.dart';
+import '../../social/presentation/widgets/review_actions_bar.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   final Movie movie;
@@ -968,12 +969,20 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                       Text(
                         r.content,
                         style: const TextStyle(
-                          color: Color(0xFF899AA9),
+                                                    color: Color(0xFF899AA9),
                           fontSize: 13,
                           height: 1.4,
                         ),
                       ),
                     ],
+                    const SizedBox(height: 6),
+                    ReviewActionsBar(
+                      key: ValueKey('detail-review-${r.id}'),
+                      reviewId: r.id,
+                      initialLiked: r.likedByMe,
+                      initialLikeCount: r.likeCount,
+                      initialCommentCount: r.commentCount,
+                    ),
                   ],
                 ),
               ))

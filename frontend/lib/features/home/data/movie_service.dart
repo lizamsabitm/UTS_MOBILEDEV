@@ -108,7 +108,7 @@ class MovieService {
 
   Future<List<ReviewModel>> fetchReviews(int tmdbId) async {
     try {
-      final response = await _api.get('/reviews/movie/$tmdbId', auth: false);
+      final response = await _api.get('/reviews/movie/$tmdbId', auth: true);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final list = data is Map ? (data['data'] ?? []) : data;
@@ -186,7 +186,7 @@ class MovieService {
 
   Future<List<ReviewModel>> fetchCommunityReviews() async {
     try {
-      final response = await _api.get('/reviews', auth: false);
+      final response = await _api.get('/reviews', auth: true);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final list = data is Map ? (data['data'] ?? []) : data;

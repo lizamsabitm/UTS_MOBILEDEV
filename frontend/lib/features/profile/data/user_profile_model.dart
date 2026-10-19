@@ -39,6 +39,9 @@ class UserProfile {
   final String name;
   final List<UserReviewEntry> reviews;
   final List<Movie> watchlist;
+  final int followerCount;
+  final int followingCount;
+  final int likeCount;
 
   UserProfile({
     required this.id,
@@ -47,6 +50,9 @@ class UserProfile {
     required this.name,
     this.reviews = const [],
     this.watchlist = const [],
+    this.followerCount = 0,
+    this.followingCount = 0,
+    this.likeCount = 0,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -66,7 +72,7 @@ class UserProfile {
         return Movie.fromJson(w as Map<String, dynamic>);
       }).toList();
     }
-
+    final counts = json['_count'] is Map ? json['_count'] as Map : const {};
     return UserProfile(
       id: json['id'] ?? 0,
       email: json['email'] ?? '',
@@ -74,6 +80,9 @@ class UserProfile {
       name: json['name'] ?? '',
       reviews: reviewsList,
       watchlist: watchlistList,
+      followerCount: counts['followers'] ?? 0,
+      followingCount: counts['following'] ?? 0,
+      likeCount: counts['likes'] ?? 0,
     );
   }
 }

@@ -8,6 +8,7 @@ import '../data/movie_service.dart';
 import '../data/review_model.dart';
 import 'movie_detail_screen.dart';
 import 'widgets/movie_poster_card.dart';
+import '../../social/presentation/widgets/review_actions_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -330,16 +331,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                     : const Color(0xFF33414E),
                               );
                             }),
-                            const SizedBox(width: 6),
-                            const Icon(
-                              Icons.favorite,
-                              size: 13,
-                              color: Color(0xFFFF8000),
-                            ),
+                                                        if (!hasLive) ...[
+                              const SizedBox(width: 6),
+                              const Icon(
+                                Icons.favorite,
+                                size: 13,
+                                color: Color(0xFFFF8000),
+                              ),
+                            ],
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Text(
+                                                Text(
                           content,
                           style: const TextStyle(
                             color: Color(0xFFBAC6D0),
@@ -347,6 +350,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 1.4,
                           ),
                         ),
+                        if (hasLive) ...[
+                          const SizedBox(height: 8),
+                          ReviewActionsBar(
+                            key: ValueKey('home-review-${liveReviews[idx].id}'),
+                            reviewId: liveReviews[idx].id,
+                            initialLiked: liveReviews[idx].likedByMe,
+                            initialLikeCount: liveReviews[idx].likeCount,
+                            initialCommentCount: liveReviews[idx].commentCount,
+                          ),
+                        ],
                       ],
                     ),
                   ),

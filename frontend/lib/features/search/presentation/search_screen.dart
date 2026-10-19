@@ -7,6 +7,7 @@ import '../../home/data/movie_model.dart';
 import '../../home/data/movie_service.dart';
 import '../../home/presentation/movie_detail_screen.dart';
 import '../../home/presentation/widgets/movie_poster_card.dart';
+import '../../social/presentation/member_search_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -25,6 +26,8 @@ class _SearchScreenState extends State<SearchScreen> {
   String? _errorMessage;
 
   final List<String> _browseCategories = [
+    'Members',
+    'Release date',
     'Release date',
     'Genre, country or language',
     'Service',
@@ -227,7 +230,11 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             trailing: const Icon(Icons.chevron_right, color: AppTheme.textSecondary, size: 20),
             onTap: () {
-              if (category == 'Most popular') {
+                            if (category == 'Members') {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const MemberSearchScreen()),
+                );
+              } else if (category == 'Most popular') {
                 _searchController.text = 'Avenger';
                 _performSearch('Avenger');
               }
