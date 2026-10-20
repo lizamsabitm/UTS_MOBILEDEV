@@ -1,72 +1,88 @@
-# 🎬 Dokumentasi Lengkap Aplikasi Layarboxd (Letterboxd Clone)
+# Layarboxd
 
-**Proyek:** Ujian Tengah Semester (UTS) Pemrograman Aplikasi Bergerak 2026  
-**Tech Stack:** Flutter (Frontend), Express.js + Prisma ORM (Backend), MySQL XAMPP (Database), TMDB API v3 (Movie Service).
+Layarboxd adalah aplikasi *mobile* pencatatan, *watchlist*, dan ulasan film.
 
----
+## Anggota Kelompok
+1. [Lizam Sabit Mafaiz] - [24051214106]
+2. [Rizal Abid Alfarizi] - [24051214114]
+3. [Farhan Putra Pratama] - [24051214115]
+4. [Abdur Rahman Jibrin] - [24051214126]
+5. [Achmad Amirul Mu'minin] - [24051214128]
 
-## 📁 Struktur Berkas Dokumentasi
-
-Semua berkas dokumentasi proyek telah dirangkum dalam satu folder ini:
-
-```
-d:\New folder\dokumentasi\
-├── README.md                          <-- (Dokumen ini) Ringkasan & Indeks Utama
-├── PRD_Layarboxd_Frontend.md          <-- Dokumen Spesifikasi Kebutuhan Produk (PRD)
-├── LAPORAN_INTEGRASI_BACKEND.md       <-- Rincian Teknis Endpoint & Integrasi Database
-├── PANDUAN_SETUP_DAN_RUNNING.md       <-- Panduan Instalasi & Menjalankan Proyek
-└── screenshots/                       <-- Bukti Tangkapan Layar & Video Pengujian
-    ├── 01_beranda_film_populer.png
-    ├── 02_ulasan_komunitas_live_mysql.png
-    ├── 03_quick_log_pencarian_film.png
-    ├── 04_halaman_profil_user.png
-    ├── 05_form_edit_profil_settings.png
-    ├── 06_profil_setelah_diedit_database.png
-    └── video_demo_interaksi.webp
-```
+## Tentang Aplikasi
+* **Aplikasi Asli:** Letterboxd
+* **Nama Plesetan:** Layarboxd
+* **Frontend:** Flutter
+* **Backend:** Node.js, Express.js
+* **Database:** MySQL (via XAMPP) dengan Prisma ORM
+* **Third-Party API:** TMDB (The Movie Database) API
 
 ---
 
-## 🌟 Fitur Utama yang Telah Diimplementasikan
+## Panduan Menjalankan Proyek
 
-### 1. Sebelum Login (Authentication Experience)
-- **Splash Screen:** Tampilan cinematic onboarding dengan tombol *Get Started* dan opsi masuk akun.
-- **Login Screen:** Form login modern Letterboxd-style dengan validasi kredensial langsung ke backend.
-- **Register Screen:** Pendaftaran pengguna baru lengkap dengan enkripsi password `bcrypt`.
-
-### 2. Setelah Login (Main Application Experience)
-- **Bottom Navigation 5 Menu:**
-  - 🎬 **Films:** Katalog film populer TMDB, poster grid, carousel trending, dan editorial.
-  - 🔍 **Search:** Pencarian film *real-time* dengan *debouncing* dan kategori eksplorasi.
-  - ➕ **Center Green Quick Log:** Akses cepat modal pencarian dan pencatatan film dari layar mana saja.
-  - ⚡ **Activity:** Feed aktivitas teman dan personal bertema *The Prestige*.
-  - 👤 **Profile:** Statistik lengkap (Films, Diary, Reviews, Watchlist, Lists), histogram rating, dan foto profil.
-- **Halaman Detail Film (`MovieDetailScreen`):**
-  - Banner latar belakang dan poster film beresolusi tinggi.
-  - Grafik distribusi rating anggota, ringkasan sinopsis, sutradara, durasi, dan daftar pemeran.
-  - Tombol aksi: **Watched**, **Like**, **Watchlist**, dan dialog input ulasan & rating bintang 1–5.
-- **Halaman Pengaturan Profil (`ProfileSettingsScreen`):**
-  - Form interaktif untuk mengubah nama, email, lokasi, situs web, bio, dan kata ganti.
-  - Perubahan data tersimpan secara langsung ke database MySQL dan langsung terupdate di tampilan profil.
-
----
-
-## 🚀 Panduan Ringkas Menjalankan Proyek
-
-1. **Jalankan MySQL:** Buka XAMPP dan nyalakan modul MySQL (`port 3306`).
-2. **Jalankan Backend:**
-   ```bash
-   cd "d:\New folder\UTS_MOBILEDEV-main\UTS_MOBILEDEV-main\backend"
-   node server.js
+Proyek ini terdiri dari Backend (Node.js/Express) dan Frontend (Flutter). Ikuti panduan di bawah ini untuk menjalankan aplikasi secara lokal.
+Persiapan Awal
+Buka aplikasi XAMPP lalu nyalakan (Start) modul Apache dan MySQL.
+Pastikan database bernama `layarboxd_db` (tersedia di folder database) sudah tersedia di MySQL lokal.
+1. Menjalankan Backend
+Buka terminal atau Command Prompt, arahkan ke folder `backend`:
+```bash
+   cd backend
    ```
-3. **Jalankan Flutter:**
-   ```bash
-   cd "d:\New folder\UTS_MOBILEDEV-main"
+Instal semua dependensi (jika belum pernah dilakukan):
+```bash
+   npm install
+   ```
+Pastikan file `.env` sudah dikonfigurasi (berisi `DATABASE_URL`, `JWT_SECRET`, dan `TMDB_API_KEY`) *untuk file .env bisa dilihat di pengumpulan LMS*.
+Jalankan server backend:
+```bash
+   npx nodemon server.js
+   ```
+Pastikan muncul keterangan bahwa server berjalan di port 3000.
+2. Konfigurasi Jaringan Frontend
+Buka terminal (CMD) di Windows, ketik `ipconfig` untuk melihat IP Address laptop (IPv4 Address).
+Di VS Code, buka folder `frontend`, lalu cari file konfigurasi API di: `core/config/api_config.dart`.
+Pastikan variabel `defaultLanUrl` sudah diubah menggunakan IP Address laptop tersebut.
+Contoh: `static const String defaultLanUrl = 'http://192.168.1.5:3000/api';`
+3. Persiapan Menjalankan Frontend
+Buka terminal baru, arahkan ke folder `frontend`:
+```bash
+   cd frontend
+   ```
+Bersihkan cache dan unduh paket Flutter:
+```bash
+   flutter clean
+   flutter pub get
+   ```
+4. Pilihan Menjalankan Aplikasi (Web / HP)
+Bisa dipilih antara tiga opsi di bawah ini untuk menjalankan aplikasi Layarboxd:
+
+Opsi A: Menjalankan di Web Browser (Google Chrome)
+Opsi ini sangat cepat dan praktis untuk simulasi di laptop.
+Pastikan Google Chrome sudah terinstal di laptop.
+Pada terminal folder `frontend`, jalankan perintah:
+```bash
    flutter run -d chrome
    ```
-4. **Build APK Android:**
-   File APK rilis siap pakai (Release APK) dengan ikon kustom & koneksi TMDB berlokasi di:
-   `apk/Layarboxd-release.apk`
+Aplikasi Layarboxd versi web akan otomatis terbuka di tab baru Google Chrome.
+
+Opsi B: Menjalankan di HP (Perangkat Fisik Android)
+Opsi ini digunakan untuk melihat dan menguji aplikasi langsung di layar smartphone.
+Pastikan laptop (Server) dan HP penguji terhubung ke jaringan Wi-Fi/Hotspot yang sama.
+Pastikan HP Android sudah mengaktifkan Developer Options dan USB Debugging.
+Sambungkan HP ke laptop menggunakan kabel USB.
+Pada terminal folder `frontend`, jalankan perintah:
+```bash
+   flutter run
+   ```
+Jika muncul prompt pilihan perangkat, pilih perangkat Android milikmu, dan tunggu hingga proses build selesai dan aplikasi terbuka di HP.
+
+Opsi C: Menggunakan File APK (Tanpa Install Flutter)**
+1. Buka folder `apk/` dan pindahkan *file* `Layarboxd-release.apk` ke HP Android.
+2. Instal *file* APK tersebut di HP.
+3. **PENTING:** Pastikan HP Android tersebut terhubung ke **jaringan Wi-Fi yang sama** dengan laptop yang sedang menjalankan Server Backend & XAMPP.
+4. Buka aplikasi Layarboxd yang sudah terinstal.
 
 ---
 
