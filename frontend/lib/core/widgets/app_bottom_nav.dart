@@ -18,7 +18,7 @@ class AppBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF14181C),
+        color: Color(0xFF445566),
         border: Border(
           top: BorderSide(color: Color(0xFF2C3946), width: 0.5),
         ),
@@ -105,13 +105,13 @@ class AppBottomNavigationBar extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF40BCE8) : Colors.transparent,
+              color: isSelected ? const Color(0xFF3D4F5F) : Colors.transparent,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(
               isSelected ? activeIcon : icon,
               size: 24,
-              color: isSelected ? const Color(0xFF14181C) : AppTheme.textSecondary,
+              color: isSelected ? const Color(0xFF40BCE8) : AppTheme.textSecondary,
             ),
           ),
         ),

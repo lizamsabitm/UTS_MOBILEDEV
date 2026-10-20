@@ -208,8 +208,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
             itemCount: count + 1,
-            separatorBuilder: (_, __) =>
-                const Divider(color: Color(0xFF242E37), height: 32),
+            separatorBuilder: (_, idx) =>
+                idx == 0 ? const SizedBox.shrink() : const Divider(color: Color(0xFF242E37), height: 32),
             itemBuilder: (context, index) {
               if (index == 0) {
                 return Padding(
@@ -244,12 +244,21 @@ class _HomeScreenState extends State<HomeScreen> {
               final movieTitle = hasLive
                   ? (liveReviews[idx].movieTitle ?? 'Film Review')
                   : FallbackSocialData.popularReviews[idx].movieTitle;
+              final releaseYear = hasLive
+                  ? ''
+                  : FallbackSocialData.popularReviews[idx].releaseYear;
               final authorName = hasLive
                   ? liveReviews[idx].name
                   : FallbackSocialData.popularReviews[idx].authorName;
+              final authorAvatar = hasLive
+                  ? null
+                  : FallbackSocialData.popularReviews[idx].authorAvatar;
               final rating = hasLive
                   ? liveReviews[idx].rating
                   : FallbackSocialData.popularReviews[idx].rating;
+              final hasHeart = hasLive
+                  ? false
+                  : FallbackSocialData.popularReviews[idx].hasHeart;
               final content = hasLive
                   ? liveReviews[idx].content
                   : FallbackSocialData.popularReviews[idx].content;
@@ -257,112 +266,133 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? liveReviews[idx].posterUrl
                   : FallbackSocialData.popularReviews[idx].posterUrl;
 
-              return Row(
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Left: Poster thumbnail
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: SizedBox(
-                      width: 72,
-                      height: 105,
-                      child: Image.network(
-                        posterUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            Container(color: const Color(0xFF2C3946)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  // Right: Movie info, Rating, Author avatar, review text
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                movieTitle,
+                  // Row 1: Movie title + year (left), author name + avatar (right)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: movieTitle,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              authorName,
-                              style: const TextStyle(
-                                color: AppTheme.textSecondary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            CircleAvatar(
-                              radius: 11,
-                              backgroundColor: const Color(0xFF00E054),
-                              child: Text(
+                              if (releaseYear.isNotEmpty) ...[
+                                TextSpan(
+                                  text: ' $releaseYear',
+                                  style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        authorName,
+                        style: const TextStyle(
+                          color: AppTheme.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      CircleAvatar(
+                        radius: 13,
+                        backgroundColor: const Color(0xFF2C3946),
+                        backgroundImage: authorAvatar != null
+                            ? NetworkImage(authorAvatar)
+                            : null,
+                        child: authorAvatar == null
+                            ? Text(
                                 authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U',
                                 style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 10,
+                                  color: Colors.white,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                            ),
-                          ],
+                              )
+                            : null,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // Row 2: Star rating
+                  Row(
+                    children: [
+                      ...List.generate(5, (sIdx) {
+                        final isFilled = rating >= (sIdx + 1);
+                        return Icon(
+                          isFilled ? Icons.star_rounded : Icons.star_outline_rounded,
+                          size: 16,
+                          color: isFilled
+                              ? const Color(0xFF00E054)
+                              : const Color(0xFF33414E),
+                        );
+                      }),
+                      if (hasHeart) ...[
+                        const SizedBox(width: 6),
+                        const Icon(
+                          Icons.favorite,
+                          size: 14,
+                          color: Color(0xFFFF8000),
                         ),
-                        const SizedBox(height: 6),
-                        // Rating stars
-                        Row(
-                          children: [
-                            ...List.generate(5, (sIdx) {
-                              final isFilled = rating >= (sIdx + 1);
-                              return Icon(
-                                isFilled ? Icons.star_rounded : Icons.star_outline_rounded,
-                                size: 14,
-                                color: isFilled
-                                    ? const Color(0xFF00E054)
-                                    : const Color(0xFF33414E),
-                              );
-                            }),
-                                                        if (!hasLive) ...[
-                              const SizedBox(width: 6),
-                              const Icon(
-                                Icons.favorite,
-                                size: 13,
-                                color: Color(0xFFFF8000),
-                              ),
-                            ],
-                          ],
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  // Row 3: Poster (left) + Review text (right)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: SizedBox(
+                          width: 80,
+                          height: 120,
+                          child: Image.network(
+                            posterUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                Container(color: const Color(0xFF2C3946)),
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                                                Text(
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
                           content,
                           style: const TextStyle(
                             color: Color(0xFFBAC6D0),
                             fontSize: 13,
-                            height: 1.4,
+                            height: 1.45,
                           ),
                         ),
-                        if (hasLive) ...[
-                          const SizedBox(height: 8),
-                          ReviewActionsBar(
-                            key: ValueKey('home-review-${liveReviews[idx].id}'),
-                            reviewId: liveReviews[idx].id,
-                            initialLiked: liveReviews[idx].likedByMe,
-                            initialLikeCount: liveReviews[idx].likeCount,
-                            initialCommentCount: liveReviews[idx].commentCount,
-                          ),
-                        ],
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                  if (hasLive) ...[
+                    const SizedBox(height: 8),
+                    ReviewActionsBar(
+                      key: ValueKey('home-review-${liveReviews[idx].id}'),
+                      reviewId: liveReviews[idx].id,
+                      initialLiked: liveReviews[idx].likedByMe,
+                      initialLikeCount: liveReviews[idx].likeCount,
+                      initialCommentCount: liveReviews[idx].commentCount,
+                    ),
+                  ],
                 ],
               );
             },
@@ -378,12 +408,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
       itemCount: lists.length + 1,
-      separatorBuilder: (_, __) =>
-          const Divider(color: Color(0xFF242E37), height: 36),
+      separatorBuilder: (_, idx) =>
+          idx == 0 ? const SizedBox.shrink() : const Divider(color: Color(0xFF242E37), height: 36),
       itemBuilder: (context, index) {
         if (index == 0) {
           return const Padding(
-            padding: EdgeInsets.only(bottom: 12),
+            padding: EdgeInsets.only(bottom: 4),
             child: Text(
               'Popular this week',
               style: TextStyle(
@@ -476,62 +506,82 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildJournalTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+    final journalEntries = [
+      {
+        'image': 'https://image.tmdb.org/t/p/w780/pB8BM7pdSp6B6Ih7QI4S2t0POhQ.jpg',
+        'title': 'Dancing Through Life',
+        'subtitle': 'Oscar winner Michelle Yeoh on her illustrious, action-packed career.',
+      },
+      {
+        'image': 'https://image.tmdb.org/t/p/w780/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
+        'title': 'Behold the Holy Grail',
+        'subtitle': 'The scandal, suppression and salvation of Ken Russell\'s The Devils.',
+      },
+      {
+        'image': 'https://image.tmdb.org/t/p/w780/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg',
+        'title': 'The Enduring Wonder of Sci-Fi Cinema',
+        'subtitle': 'How visionary directors used practical miniatures and scientific fidelity to capture humanity\'s deepest existential questions.',
+      },
+      {
+        'image': 'https://image.tmdb.org/t/p/w780/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
+        'title': 'A Century of Shadow and Light',
+        'subtitle': 'Exploring the evolution of cinematography from silent film to modern masterpieces.',
+      },
+    ];
+
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      itemCount: journalEntries.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 14),
+      itemBuilder: (context, index) {
+        final entry = journalEntries[index];
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(10),
           child: Container(
             color: const Color(0xFF1B2228),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.network(
-                  'https://image.tmdb.org/t/p/w780/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
-                  height: 170,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.network(
+                entry['image']!,
+                height: 220,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 220,
+                  color: const Color(0xFF2C3946),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'EDITORIAL · 5 MIN READ',
-                        style: TextStyle(
-                          color: AppTheme.accentGreen,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                        ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      entry['title']!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        'The Enduring Wonder of Sci-Fi Cinema: From 2001 to Interstellar',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      entry['subtitle']!,
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 13,
+                        height: 1.4,
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        'How visionary directors used practical miniatures and scientific fidelity to capture humanity\'s deepest existential questions.',
-                        style: TextStyle(
-                          color: AppTheme.textSecondary,
-                          fontSize: 13,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+            ],
             ),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
