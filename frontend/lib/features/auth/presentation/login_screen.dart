@@ -96,9 +96,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   left: 20,
                   right: 20,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _buildDot(AppTheme.accentGreen),
                           const SizedBox(width: 6),
@@ -120,6 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 12),
                       const Text(
                         'Sign in to Layarboxd',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 26,

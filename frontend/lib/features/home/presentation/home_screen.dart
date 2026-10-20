@@ -44,9 +44,11 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           backgroundColor: AppTheme.headerBackground,
           elevation: 0,
+          automaticallyImplyLeading: false,
           centerTitle: true,
           title: const Text(
             'Layarboxd',
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w900,
