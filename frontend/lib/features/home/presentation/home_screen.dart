@@ -408,12 +408,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
       itemCount: lists.length + 1,
-      separatorBuilder: (_, __) =>
-          const Divider(color: Color(0xFF242E37), height: 36),
+      separatorBuilder: (_, idx) =>
+          idx == 0 ? const SizedBox.shrink() : const Divider(color: Color(0xFF242E37), height: 36),
       itemBuilder: (context, index) {
         if (index == 0) {
           return const Padding(
-            padding: EdgeInsets.only(bottom: 12),
+            padding: EdgeInsets.only(bottom: 4),
             child: Text(
               'Popular this week',
               style: TextStyle(
@@ -506,62 +506,82 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildJournalTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+    final journalEntries = [
+      {
+        'image': 'https://image.tmdb.org/t/p/w780/pB8BM7pdSp6B6Ih7QI4S2t0POhQ.jpg',
+        'title': 'Dancing Through Life',
+        'subtitle': 'Oscar winner Michelle Yeoh on her illustrious, action-packed career.',
+      },
+      {
+        'image': 'https://image.tmdb.org/t/p/w780/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
+        'title': 'Behold the Holy Grail',
+        'subtitle': 'The scandal, suppression and salvation of Ken Russell\'s The Devils.',
+      },
+      {
+        'image': 'https://image.tmdb.org/t/p/w780/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg',
+        'title': 'The Enduring Wonder of Sci-Fi Cinema',
+        'subtitle': 'How visionary directors used practical miniatures and scientific fidelity to capture humanity\'s deepest existential questions.',
+      },
+      {
+        'image': 'https://image.tmdb.org/t/p/w780/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
+        'title': 'A Century of Shadow and Light',
+        'subtitle': 'Exploring the evolution of cinematography from silent film to modern masterpieces.',
+      },
+    ];
+
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      itemCount: journalEntries.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 14),
+      itemBuilder: (context, index) {
+        final entry = journalEntries[index];
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(10),
           child: Container(
             color: const Color(0xFF1B2228),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.network(
-                  'https://image.tmdb.org/t/p/w780/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
-                  height: 170,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.network(
+                entry['image']!,
+                height: 220,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 220,
+                  color: const Color(0xFF2C3946),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'EDITORIAL · 5 MIN READ',
-                        style: TextStyle(
-                          color: AppTheme.accentGreen,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                        ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      entry['title']!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        'The Enduring Wonder of Sci-Fi Cinema: From 2001 to Interstellar',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      entry['subtitle']!,
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 13,
+                        height: 1.4,
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        'How visionary directors used practical miniatures and scientific fidelity to capture humanity\'s deepest existential questions.',
-                        style: TextStyle(
-                          color: AppTheme.textSecondary,
-                          fontSize: 13,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+            ],
             ),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
