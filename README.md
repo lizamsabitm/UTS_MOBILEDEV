@@ -25,6 +25,7 @@ Proyek ini terdiri dari Backend (Node.js/Express) dan Frontend (Flutter). Ikuti 
 Persiapan Awal
 Buka aplikasi XAMPP lalu nyalakan (Start) modul Apache dan MySQL.
 Pastikan database bernama `layarboxd_db` (tersedia di folder database) sudah tersedia di MySQL lokal.
+
 1. Menjalankan Backend
 Buka terminal atau Command Prompt, arahkan ke folder `backend`:
 ```bash
@@ -40,11 +41,13 @@ Jalankan server backend:
    npx nodemon server.js
    ```
 Pastikan muncul keterangan bahwa server berjalan di port 3000.
+
 2. Konfigurasi Jaringan Frontend
 Buka terminal (CMD) di Windows, ketik `ipconfig` untuk melihat IP Address laptop (IPv4 Address).
 Di VS Code, buka folder `frontend`, lalu cari file konfigurasi API di: `core/config/api_config.dart`.
 Pastikan variabel `defaultLanUrl` sudah diubah menggunakan IP Address laptop tersebut.
 Contoh: `static const String defaultLanUrl = 'http://192.168.1.5:3000/api';`
+
 3. Persiapan Menjalankan Frontend
 Buka terminal baru, arahkan ke folder `frontend`:
 ```bash
